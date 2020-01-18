@@ -2,16 +2,11 @@
   "AWSTemplateFormatVersion" : "2010-09-09",
   "Description" : "AWS CodeDeploy infra",
   "Parameters" : {
-    "VPCID": {
-      "Description" : "VPC ID",
-      "Type": "String",
-      "Default": "vpc-16438e72"
-    },
-
+   
     "myIP": {
       "Description" : "Enter your IP address in CIDR notation, e.g. 100.150.200.225/32",
       "Type": "String",
-      "Default": "50.186.16.59/32"
+      "Default": "0.0.0.0/0"
     },
 
     "InstanceProfile": {
@@ -29,13 +24,13 @@
     "AZ"  : {
       "Description" : "Comma delimited list of AvailabilityZones where the instances will be created",
       "Type"        : "CommaDelimitedList",
-      "Default": "us-east-1a,us-east-1c,us-east-1d"
+      "Default": "us-east-2a,us-east-2c,us-east-2b"
     },
 
     "PublicSubnets"  : {
       "Description" : "Comma delimited list of public subnets",
       "Type"        : "CommaDelimitedList",
-      "Default": "subnet-6fa38e36,subnet-4ba2f160,subnet-13b1ba64"
+      "Default"     : !ImportValue codedeploy-vpc-VPCID  
     },
 
     "InstanceType" : {
@@ -84,7 +79,7 @@
         }
       ],
       "VpcId": {
-        "Ref": "VPCID"
+        "Ref": !ImportValue codedeploy-vpc-VPCID 
       }
     }
     },

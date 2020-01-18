@@ -16,7 +16,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 26d04ec1-15ec-467c-b812-6d23f41ff3b3
-  PublicSubNetC:
+  PublicSubnetC:
     Type: 'AWS::EC2::Subnet'
     Properties:
       AvailabilityZone: us-east-2c
@@ -125,7 +125,7 @@ Resources:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
       RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref PublicSubNetC
+      SubnetId: !Ref PublicSubnetC
     Metadata:
       'AWS::CloudFormation::Designer':
         id: ef469594-a7bb-41ed-bde0-8c511ba2b117
@@ -135,6 +135,15 @@ Outputs:
     Value: !Ref VPC
     Export:
       Name: !Sub '${AWS::StackName}-VPCID'
+  SubnetList:
+    Description: the subnets of the VpcId
+    Value: !Join
+      - ','
+      - - !Ref PublicSubnetA
+        - !Ref PublicSubnetB
+        - !Ref PublicSubnetC
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetList'
   WebServerSecurityGroup:
     Description: The security group ID to use for public web servers
     Value: !GetAtt 
