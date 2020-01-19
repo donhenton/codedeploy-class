@@ -110,6 +110,10 @@ Resources:
           FromPort: '80'
           ToPort: '80'
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
     Metadata:
       'AWS::CloudFormation::Designer':
         id: a71f34a0-ab35-4b11-bdb3-99d594544c2f
@@ -137,7 +141,7 @@ Outputs:
       Name: !Sub '${AWS::StackName}-VPCID'
   SubnetList:
     Description: the subnets of the VpcId
-    Value: !Join
+    Value: !Join 
       - ','
       - - !Ref PublicSubnetA
         - !Ref PublicSubnetB
@@ -192,6 +196,7 @@ Metadata:
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
+        - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
     dee671ab-4987-4922-b6af-d854c5ba64a9:
       size:
         width: 240
@@ -204,6 +209,7 @@ Metadata:
       embeds:
         - 84cd8c6a-8e5d-469f-89e9-69facbafaa31
       iscontainedinside:
+        - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
@@ -233,6 +239,7 @@ Metadata:
         - dee671ab-4987-4922-b6af-d854c5ba64a9
         - dee671ab-4987-4922-b6af-d854c5ba64a9
         - dee671ab-4987-4922-b6af-d854c5ba64a9
+        - dee671ab-4987-4922-b6af-d854c5ba64a9
       dependson:
         - 3cd396ed-22cf-4981-95d7-5315ebf77ca4
     523fe2b9-7777-43f5-aede-d3cfb08b43d7:
@@ -246,6 +253,7 @@ Metadata:
       parent: 26d04ec1-15ec-467c-b812-6d23f41ff3b3
       embeds: []
       iscontainedinside:
+        - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
@@ -273,6 +281,7 @@ Metadata:
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
+        - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
     14e80b14-8f29-4bf9-8610-5cd17c1519bb:
       size:
         width: 150
@@ -284,6 +293,7 @@ Metadata:
       parent: 26d04ec1-15ec-467c-b812-6d23f41ff3b3
       embeds: []
       iscontainedinside:
+        - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
         - 26d04ec1-15ec-467c-b812-6d23f41ff3b3
     36ac26b2-6764-4074-837d-f5c01455131b:
