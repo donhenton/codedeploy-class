@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: AWS CodeDeploy infra
 Parameters:
-  # VPCID:
-  #   Description: VPC ID
-  #   Type: String
-  #   Default: vpc-16438e72
+  VPCID:
+    Description: VPC ID
+    Type: String
+    Default: vpc-02e13e01bbbdc779b
   myIP:
     Description: 'Enter your IP address in CIDR notation, e.g. 100.150.200.225/32'
     Type: String
@@ -14,21 +14,23 @@ Parameters:
       Use the full ARN for SimpleCodeDeployInstanceProfile or
       AdvancedCodeDeployInstanceProfile
     Type: String
-    Default: 'arn:aws:iam::235926060045:policy/SimpleCodeDeployInstanceProfilePolicy'
+    Default: >-
+      arn:aws:iam::235926060045:instance-profile/AdvancedCodeDeployInstanceProfile
   KeyName:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
     Type: 'AWS::EC2::KeyPair::KeyName'
-    ConstraintDescription: The name of an existing EC2 KeyPair. 
+    ConstraintDescription: The name of an existing EC2 KeyPair.
+    Default: CdkKeyPair
   AZ:
     Description: >-
       Comma delimited list of AvailabilityZones where the instances will be
       created
     Type: CommaDelimitedList
     Default: 'us-east-2a,us-east-2b,us-east-2c'
-  # PublicSubnets:
-  #   Description: Comma delimited list of public subnets
-  #   Type: CommaDelimitedList
-  #   Default:  !ImportValue codedeploy-vpc-SubnetList
+  PublicSubnets:
+    Description: Comma delimited list of public subnets
+    Type: CommaDelimitedList
+    Default: 'subnet-0545f39f69343a4b4,subnet-067f54c03daabe7bb,subnet-0d7c590056564ff04'
   InstanceType:
     Description: Provide InstanceType to be used
     Type: String
@@ -59,14 +61,14 @@ Resources:
           ToPort: 80
         - CidrIp: !Ref myIP
           IpProtocol: '-1'
-      VpcId: !ImportValue codedeploy-vpc-VPCID
+      VpcId: !Ref VPCID
   LinuxWebSNSTopic:
     Type: 'AWS::SNS::Topic'
   LinuxWebASG:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
     Properties:
       AvailabilityZones: !Ref AZ
-      VPCZoneIdentifier: !Split [",", !ImportValue codedeploy-vpc-SubnetList]
+      VPCZoneIdentifier: !Ref PublicSubnets
       MinSize: '3'
       MaxSize: '3'
       HealthCheckType: ELB
@@ -209,7 +211,7 @@ Resources:
           Protocol: HTTP
       SecurityGroups:
         - !Ref WebSecurityGroup
-      Subnets: !Split [",", !ImportValue codedeploy-vpc-SubnetList]
+      Subnets: !Ref PublicSubnets
       Tags:
         - Key: Network
           Value: public
@@ -219,7 +221,7 @@ Resources:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
     Properties:
       AvailabilityZones: !Ref AZ
-      VPCZoneIdentifier: !Split [",", !ImportValue codedeploy-vpc-SubnetList]
+      VPCZoneIdentifier: !Ref PublicSubnets
       MinSize: '3'
       MaxSize: '3'
       HealthCheckType: ELB
@@ -340,7 +342,7 @@ Resources:
           Protocol: HTTP
       SecurityGroups:
         - !Ref WebSecurityGroup
-      Subnets: !Split [",", !ImportValue codedeploy-vpc-SubnetList]
+      Subnets: !Ref PublicSubnets
       Tags:
         - Key: Network
           Value: public
