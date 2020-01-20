@@ -47,8 +47,11 @@ Resources:
       Roles:
         - !Ref awsdhentonEC2Role
 Outputs:
-    InstanceProfile:
+    MyInstanceProfile:
         Description: The instance profile to assign to your EC2 instances
         Value: !Ref awsdhentonEC2InstanceProfile
         Export: 
           Name: !Sub "${AWS::StackName}-InstanceProfile"
+    MyInstanceProfile2:
+        Description: instance profile 2
+        Value: !Ref awsdhentonEC2InstanceProfile
