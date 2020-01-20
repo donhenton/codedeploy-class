@@ -60,7 +60,7 @@ Outputs:
         Value: !Ref awsdhentonEC2InstanceProfile
         Export: 
           Name: !Sub "${AWS::StackName}-InstanceProfile"
-     MyInstanceRole:
+    MyInstanceRole:
         Description: The for your EC2 instances
         Value: !Ref awsdhentonEC2Role
         Export: 
