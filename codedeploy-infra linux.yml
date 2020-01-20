@@ -5,10 +5,6 @@ Parameters:
     Description: VPC ID
     Type: String
     Default: vpc-02e13e01bbbdc779b
-  myIP:
-    Description: 'Enter your IP address in CIDR notation, e.g. 100.150.200.225/32'
-    Type: String
-    Default: 0.0.0.0/0
   InstanceProfile:
     Description: >-
       Use the full ARN for SimpleCodeDeployInstanceProfile or
@@ -51,12 +47,14 @@ Resources:
           IpProtocol: '-1'
           ToPort: -1
       SecurityGroupIngress:
-        - CidrIp: 0.0.0.0/0
-          FromPort: 80
-          IpProtocol: '6'
-          ToPort: 80
-        - CidrIp: !Ref myIP
-          IpProtocol: '-1'
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0  
       VpcId: !Ref VPCID
   LinuxWebSNSTopic:
     Type: 'AWS::SNS::Topic'
@@ -106,17 +104,16 @@ Resources:
               yum install httpd -y
 
             - |+
-              yum install ruby
+              yum install ruby -y
 
             - |+
-              yum install aws-cli
+              yum install aws-cli -y
 
             - |+
               cd ~
 
-            - >+
-              aws s3 cp s3://aws-codedeploy-us-east-1/latest/install . --region
-              us-east-1
+            - |+
+              aws s3 cp s3://aws-codedeploy-us-east-2/latest/install . --region us-east-2
 
             - |+
               chmod +x ./install
@@ -125,10 +122,10 @@ Resources:
               ./install auto
 
             - |+
-              echo 'hello world' > /var/www/html/index.html
+              echo "hello" | sudo tee /var/www/html/index.html
 
             - |+
-              hostname >> /var/www/html/index.html
+              echo   | sudo tee /var/www/html/index.html -a
 
             - |+
               chkconfig httpd on
