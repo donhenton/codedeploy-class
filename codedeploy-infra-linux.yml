@@ -32,10 +32,6 @@ Parameters:
     Type: String
     ConstraintDescription: 'Must be a valid EC2 instance type, such as t2.medium'
     Default: t2.micro
-  LinuxAMIID:
-    Description: Linux AMI ID
-    Type: String
-    Default: ami-02ccb28830b645a41
 Resources:
   WebSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -85,7 +81,7 @@ Resources:
   LinuxWebLaunchConfig:
     Properties:
       AssociatePublicIpAddress: 'true'
-      ImageId: !Ref LinuxAMIID
+      ImageId: ami-02ccb28830b645a41
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
       SecurityGroups:
@@ -103,7 +99,7 @@ Resources:
             chmod +x ./install
             ./install auto
             echo "hello" | sudo tee /var/www/html/index.html
-            echo   | sudo tee /var/www/html/index.html -a
+            echo ${HOSTNAME}  | sudo tee /var/www/html/index.html -a
             chkconfig httpd on
             service httpd start
 
