@@ -10,6 +10,10 @@ run in the following order:
 * codedeploy-vpc.yaml
 * codedeploy-infra-linux.yaml
 
+## Github Repository Contain Deployable Bundle
+
+<https://github.com/donhenton/github-codedeploy>
+
 ## Attic
 
 The attic entries include the full item from the class (codedeploy-infra) and an attempt to use
