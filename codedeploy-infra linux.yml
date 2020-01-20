@@ -1,0 +1,219 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS CodeDeploy infra
+Parameters:
+  VPCID:
+    Description: VPC ID
+    Type: String
+    Default: vpc-02e13e01bbbdc779b
+  myIP:
+    Description: 'Enter your IP address in CIDR notation, e.g. 100.150.200.225/32'
+    Type: String
+    Default: 0.0.0.0/0
+  InstanceProfile:
+    Description: >-
+      Use the full ARN for SimpleCodeDeployInstanceProfile or
+      AdvancedCodeDeployInstanceProfile
+    Type: String
+    Default: >-
+      arn:aws:iam::235926060045:instance-profile/AdvancedCodeDeployInstanceProfile
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    ConstraintDescription: The name of an existing EC2 KeyPair.
+    Default: CdkKeyPair
+  AZ:
+    Description: >-
+      Comma delimited list of AvailabilityZones where the instances will be
+      created
+    Type: CommaDelimitedList
+    Default: 'us-east-2a,us-east-2b,us-east-2c'
+  PublicSubnets:
+    Description: Comma delimited list of public subnets
+    Type: CommaDelimitedList
+    Default: 'subnet-0545f39f69343a4b4,subnet-067f54c03daabe7bb,subnet-0d7c590056564ff04'
+  InstanceType:
+    Description: Provide InstanceType to be used
+    Type: String
+    ConstraintDescription: 'Must be a valid EC2 instance type, such as t2.medium'
+    Default: t2.micro
+  LinuxAMIID:
+    Description: Linux AMI ID
+    Type: String
+    Default: ami-02ccb28830b645a41
+Resources:
+  WebSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: WebSecurityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: -1
+          IpProtocol: '-1'
+          ToPort: -1
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: 80
+          IpProtocol: '6'
+          ToPort: 80
+        - CidrIp: !Ref myIP
+          IpProtocol: '-1'
+      VpcId: !Ref VPCID
+  LinuxWebSNSTopic:
+    Type: 'AWS::SNS::Topic'
+  LinuxWebASG:
+    Type: 'AWS::AutoScaling::AutoScalingGroup'
+    Properties:
+      AvailabilityZones: !Ref AZ
+      VPCZoneIdentifier: !Ref PublicSubnets
+      MinSize: '3'
+      MaxSize: '3'
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: '600'
+      NotificationConfiguration:
+        TopicARN: !Ref LinuxWebSNSTopic
+        NotificationTypes:
+          - 'autoscaling:EC2_INSTANCE_LAUNCH'
+          - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
+          - 'autoscaling:EC2_INSTANCE_TERMINATE'
+          - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
+      LoadBalancerNames:
+        - !Ref LinuxWebELB
+      DesiredCapacity: '3'
+      LaunchConfigurationName: !Ref LinuxWebLaunchConfig
+      Tags:
+        - Key: Name
+          Value: LinuxWebServer
+          PropagateAtLaunch: 'true'
+  LinuxWebLaunchConfig:
+    Properties:
+      AssociatePublicIpAddress: 'true'
+      ImageId: !Ref LinuxAMIID
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      SecurityGroups:
+        - !Ref WebSecurityGroup
+      IamInstanceProfile: !Ref InstanceProfile
+      UserData: !Base64 
+        'Fn::Join':
+          - ''
+          - - |+
+              #!/bin/bash
+
+            - |+
+              yum update -y
+
+            - |+
+              yum install httpd -y
+
+            - |+
+              yum install ruby
+
+            - |+
+              yum install aws-cli
+
+            - |+
+              cd ~
+
+            - >+
+              aws s3 cp s3://aws-codedeploy-us-east-1/latest/install . --region
+              us-east-1
+
+            - |+
+              chmod +x ./install
+
+            - |+
+              ./install auto
+
+            - |+
+              echo 'hello world' > /var/www/html/index.html
+
+            - |+
+              hostname >> /var/www/html/index.html
+
+            - |+
+              chkconfig httpd on
+
+            - |+
+              service httpd start
+
+    Type: 'AWS::AutoScaling::LaunchConfiguration'
+  LinuxWebAutoscaleUpPolicy:
+    Type: 'AWS::AutoScaling::ScalingPolicy'
+    Properties:
+      AdjustmentType: ChangeInCapacity
+      AutoScalingGroupName: !Ref LinuxWebASG
+      Cooldown: '300'
+      ScalingAdjustment: '1'
+  LinuxWebAutoscaleDownPolicy:
+    Type: 'AWS::AutoScaling::ScalingPolicy'
+    Properties:
+      AdjustmentType: ChangeInCapacity
+      AutoScalingGroupName: !Ref LinuxWebASG
+      Cooldown: '300'
+      ScalingAdjustment: '-1'
+  LinuxWebCloudWatchCPUAlarmHigh:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: SNS Notification and scale up if CPU Util is Higher than 90% for 10 mins
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Statistic: Average
+      Period: '300'
+      EvaluationPeriods: '2'
+      Threshold: '90'
+      AlarmActions:
+        - !Ref LinuxWebAutoscaleUpPolicy
+        - !Ref LinuxWebSNSTopic
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !Ref LinuxWebASG
+      ComparisonOperator: GreaterThanThreshold
+  LinuxWebCloudWatchCPUAlarmLow:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: SNS Notification and scale down if CPU Util is less than 70% for 10 mins
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Statistic: Average
+      Period: '300'
+      EvaluationPeriods: '2'
+      Threshold: '70'
+      AlarmActions:
+        - !Ref LinuxWebAutoscaleDownPolicy
+        - !Ref LinuxWebSNSTopic
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !Ref LinuxWebASG
+      ComparisonOperator: LessThanThreshold
+  LinuxWebELB:
+    Type: 'AWS::ElasticLoadBalancing::LoadBalancer'
+    Properties:
+      CrossZone: true
+      ConnectionDrainingPolicy:
+        Enabled: 'true'
+        Timeout: '60'
+      HealthCheck:
+        Target: 'HTTP:80/index.html'
+        HealthyThreshold: '3'
+        UnhealthyThreshold: '3'
+        Interval: '15'
+        Timeout: '5'
+      LoadBalancerName: LinuxWebELB
+      Scheme: internet-facing
+      Listeners:
+        - LoadBalancerPort: '80'
+          InstancePort: '80'
+          InstanceProtocol: HTTP
+          Protocol: HTTP
+      SecurityGroups:
+        - !Ref WebSecurityGroup
+      Subnets: !Ref PublicSubnets
+      Tags:
+        - Key: Network
+          Value: public
+Outputs:
+  LinuxWebFQDN:
+    Value: !GetAtt 
+      - LinuxWebELB
+      - DNSName
+
