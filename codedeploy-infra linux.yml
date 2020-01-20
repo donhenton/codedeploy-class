@@ -91,47 +91,21 @@ Resources:
       SecurityGroups:
         - !Ref WebSecurityGroup
       IamInstanceProfile: !Ref InstanceProfile
-      UserData: !Base64 
-        'Fn::Join':
-          - ''
-          - - |+
-              #!/bin/bash
-
-            - |+
-              yum update -y
-
-            - |+
-              yum install httpd -y
-
-            - |+
-              yum install ruby -y
-
-            - |+
-              yum install aws-cli -y
-
-            - |+
-              cd ~
-
-            - |+
-              aws s3 cp s3://aws-codedeploy-us-east-2/latest/install . --region us-east-2
-
-            - |+
-              chmod +x ./install
-
-            - |+
-              ./install auto
-
-            - |+
-              echo "hello" | sudo tee /var/www/html/index.html
-
-            - |+
-              echo   | sudo tee /var/www/html/index.html -a
-
-            - |+
-              chkconfig httpd on
-
-            - |+
-              service httpd start
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install httpd -y
+            yum install ruby -y
+            cd ~
+            curl https://aws-codedeploy-us-east-2.s3.amazonaws.com/latest/install > install
+            chmod +x ./install
+            ./install auto
+            echo "hello" | sudo tee /var/www/html/index.html
+            echo   | sudo tee /var/www/html/index.html -a
+            chkconfig httpd on
+            service httpd start
 
     Type: 'AWS::AutoScaling::LaunchConfiguration'
   LinuxWebAutoscaleUpPolicy:
