@@ -238,21 +238,38 @@ Resources:
           DeviceIndex: '0'
           DeleteOnTermination: 'true'
           SubnetId: !Ref PublicSubnet
-      UserData:
-        'Fn::Base64': !Sub >
-          #!/bin/bash
-          yum update -y
-          yum install ruby -y
-          yum install docker -y
-          usermod -a -G docker ec2-user
-          curl -L https://github.com/docker/compose/releases/download/1.23.1/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose
-          chmod +x /usr/local/bin/docker-compose
-          service docker start::w
-          chkconfig docker on
-          cd ~
-          curl https://aws-codedeploy-us-east-2.s3.amazonaws.com/latest/install > install
-          chmod +x ./install
-          ./install auto
+
+
+
+      UserData: !Base64 
+        'Fn::Join':
+          - ''
+          - - |
+              #!/bin/bash -xe
+            - |
+              yum update -y
+            - |
+              yum install ruby -y
+            - |
+              yum install docker -y
+            - |
+              usermod -a -G docker ec2-user
+            - |
+              /usr/bin/curl -L https://github.com/docker/compose/releases/download/1.23.1/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose
+            - |
+              chmod +x /usr/local/bin/docker-compose
+            - |
+              service docker start
+            - |
+              chkconfig docker on
+            - |
+              cd ~
+            - |
+              /usr/bin/curl https://aws-codedeploy-us-east-2.s3.amazonaws.com/latest/install > install
+            - |
+              chmod +x ./install
+            - |
+              ./install auto
     Metadata:
       'AWS::CloudFormation::Designer':
         id: c53ee20f-343f-44cf-91de-f598b8aaaab0
