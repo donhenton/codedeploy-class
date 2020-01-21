@@ -275,13 +275,6 @@ Resources:
         id: c53ee20f-343f-44cf-91de-f598b8aaaab0
     DependsOn:
       - InternetRoute
-  EIP:
-    Type: 'AWS::EC2::EIP'
-    Properties:
-      InstanceId: !Ref WebServerInstance
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: ac9d8fa3-928f-43f6-8c04-6031fba4aff4
 Parameters:
   ImageId:
     Description: AMI Image Id
