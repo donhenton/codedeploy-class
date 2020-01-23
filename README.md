@@ -23,7 +23,7 @@ imports from vpc
 
 ## Docker Compose
 
-Creates a single EC2 instance with Docker and Docker Compose in user data.
+Creates a single EC2 instance with Docker and Docker Compose in user data. Not related to the video
 
 ## Code Deploy
 
