@@ -7,28 +7,35 @@ repository updates the creation of the items
 
 run in the following order:
 
+* codedeploy-iam.yaml
 * codedeploy-vpc.yaml
 * codedeploy-infra-linux.yaml
 
-## Github Repository Contain Deployable Bundle
 
-<https://github.com/donhenton/github-codedeploy>
+## Github Repository Contains The Deployable Bundle
+
+<https://github.com/donhenton/github-codedeploy>. Is the item that gets deployed in the video
 
 ## Attic
 
 The attic entries include the full item from the class (codedeploy-infra) and an attempt to use
 imports from vpc
 
-## Code Deploy
+## Docker Compose
+
+Creates a single EC2 instance with Docker and Docker Compose in user data. Not related to the video
+
+## Creating the Code Deploy Action
 
 * create an EC2/On Premises application with a  Deployment group that contains a service role and a deployment type
 * service role should have AWSCodeDeployRole attached
 * deployment type is all at once or red green
+* point (via name tag) to the instances created above with codedeploy-vpc.yaml. You can also point to the auto scaling group that is created there as well.
 
 ## IAM Permissions For EC2 Instances
 
 InstanceProfile Policy -- attached to EC2 Service Role --> attached to EC2 instances via cloudformation
-codedeploy-infra-linux.yml (InstanceProfile parameter).
+codedeploy-infra-linux.yml (InstanceProfile parameter). This is also in the cloudformation iam script.
 
 You can find the ARN by going to the EC2 role, and find it there, the only way to create this ARN is with an EC2 service role
 
