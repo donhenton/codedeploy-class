@@ -1,0 +1,12 @@
+version: '3.7'
+networks:
+    bonzo-net:
+    legacy:
+services:
+    test1:
+      image: 235926060045.dkr.ecr.us-east-2.amazonaws.com/maven-docker-build-env:build-7ad83ea4-531e-4f96-a724-e14bbff530e5
+      container_name: test1
+      command: tail -F /dev/null
+      networks: 
+        - bonzo-net
+        - legacy
