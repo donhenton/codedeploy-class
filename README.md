@@ -30,6 +30,7 @@ Creates a single EC2 instance with Docker and Docker Compose in user data.
 * create an EC2/On Premises application with a  Deployment group that contains a service role and a deployment type
 * service role should have AWSCodeDeployRole attached
 * deployment type is all at once or red green
+* point (via name tag) to the instances created above with codedeploy-vpc.yaml. You can also point to the auto scaling group that is created there as well.
 
 ## IAM Permissions For EC2 Instances
 
