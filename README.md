@@ -25,7 +25,7 @@ imports from vpc
 
 Creates a single EC2 instance with Docker and Docker Compose in user data. Not related to the video
 
-## Code Deploy
+## Creating the Code Deploy Action
 
 * create an EC2/On Premises application with a  Deployment group that contains a service role and a deployment type
 * service role should have AWSCodeDeployRole attached
@@ -35,7 +35,7 @@ Creates a single EC2 instance with Docker and Docker Compose in user data. Not r
 ## IAM Permissions For EC2 Instances
 
 InstanceProfile Policy -- attached to EC2 Service Role --> attached to EC2 instances via cloudformation
-codedeploy-infra-linux.yml (InstanceProfile parameter).
+codedeploy-infra-linux.yml (InstanceProfile parameter). This is also in the cloudformation iam script.
 
 You can find the ARN by going to the EC2 role, and find it there, the only way to create this ARN is with an EC2 service role
 
