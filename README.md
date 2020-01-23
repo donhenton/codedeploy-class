@@ -19,6 +19,10 @@ run in the following order:
 The attic entries include the full item from the class (codedeploy-infra) and an attempt to use
 imports from vpc
 
+## Docker Compose
+
+Creates a single EC2 instance with Docker and Docker Compose in user data.
+
 ## Code Deploy
 
 * create an EC2/On Premises application with a  Deployment group that contains a service role and a deployment type
