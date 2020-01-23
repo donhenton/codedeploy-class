@@ -10,9 +10,9 @@ run in the following order:
 * codedeploy-vpc.yaml
 * codedeploy-infra-linux.yaml
 
-## Github Repository Contain Deployable Bundle
+## Github Repository Contains The Deployable Bundle
 
-<https://github.com/donhenton/github-codedeploy>
+<https://github.com/donhenton/github-codedeploy>. Is the item that gets deployed in the video
 
 ## Attic
 
