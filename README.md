@@ -7,8 +7,10 @@ repository updates the creation of the items
 
 run in the following order:
 
+* codedeploy-iam.yaml
 * codedeploy-vpc.yaml
 * codedeploy-infra-linux.yaml
+
 
 ## Github Repository Contains The Deployable Bundle
 
