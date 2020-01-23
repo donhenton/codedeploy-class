@@ -1,4 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
+Description: >
+   Creates a single public subnet with an EC2 instance that contains the Docker, Docker Compose, the CodeDeploy
+   Agent, an Internet Gateway, and the proper CodeDeploy Role/Profile for the EC2 Instance
 Metadata:
   'AWS::CloudFormation::Designer':
     06aa7cb0-cf30-458c-87a4-05cb73cbe7f4:
